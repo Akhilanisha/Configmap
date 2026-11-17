@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weshopify-app
+  labels:
+    app.kubernetes.io/name: weshopify
+    app.kubernetes.io/component: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: weshopify
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: weshopify
+        app.kubernetes.io/component: app
+    spec:
+      containers:
+        - name: weshopify-app
+          # Replace latest with a versioned tag from your image registry when available.
+          image: vinodscope/spring-boot-mysql:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DB_DRIVER_CLASS
+              valueFrom:
+                configMapKeyRef:
+                  name: weshopify-db-config
+                  key: DB_DRIVER_NAME_VALUE
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: weshopify-db-config
+                  key: DB_HOST_SERVICE_NAME_VALUE
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: weshopify-db-config
+                  key: DB_SCHEMA_VALUE
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: weshopify-db-config
+                  key: DB_PORT_VALUE
+            - name: DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: weshopify-db-config
+                  key: DB_USERNAME_VALUE
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: weshopify-db-secret
+                  key: mysql-app-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weshopify-app
+  labels:
+    app.kubernetes.io/name: weshopify
+    app.kubernetes.io/component: app
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: weshopify
+    app.kubernetes.io/component: app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

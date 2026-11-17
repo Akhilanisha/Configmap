@@ -1,0 +1,4 @@
+# Never commit a locally generated Secret manifest or credential file.
+*-secret.local.yml
+*-secret.local.yaml
+.env

@@ -1,0 +1,12 @@
+# Standard Amazon EKS using the Amazon EBS CSI driver.
+# Do not use this provisioner unchanged on EKS Auto Mode.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: weshopify-gp3
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+parameters:
+  type: gp3
+  encrypted: "true"
